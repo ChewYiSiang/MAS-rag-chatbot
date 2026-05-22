@@ -68,11 +68,20 @@ def ingest_documents():
         ids = [f"{pdf_file}_chunk_{i}" for i in range(len(chunks))]
         metadatas = [{"source": pdf_file, "chunk_index": i} for i in range(len(chunks))]
 
+        # checking which IDs do not exist before adding
+        existing = collection.get(ids=ids)["ids"]
+        existing_set = set(existing)
+        new_indices = [i for i, id_ in enumerate(ids) if id_ not in existing_set]
+
+        if not new_indices:
+            print(f" -> already ingested, skipping...")
+            continue
+
         collection.add(
-            documents=chunks,
-            embeddings=embeddings,
-            ids=ids,
-            metadatas=metadatas
+            documents=[chunks[i] for i in new_indices],
+            embeddings=[embeddings[i] for i in new_indices],
+            ids=[ids[i] for i in new_indices],
+            metadatas=[metadatas[i] for i in new_indices]
         )
 
         print(f" -> stored in ChromaDB")

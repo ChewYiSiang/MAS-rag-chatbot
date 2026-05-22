@@ -37,6 +37,7 @@ def retrieve_chunks(query: str) -> list[dict]:
 
     return chunks
 
+# prompt engineering
 def build_prompt(query: str, chunks: list[dict]) -> str:
     context = "\n\n---\n\n".join(
         f"Source: {c['source']}\n{c['text']}" for c in chunks
@@ -50,6 +51,7 @@ def build_prompt(query: str, chunks: list[dict]) -> str:
 
     Answer:"""
 
+# activating ollama model to return answer
 def answer_query(query: str) -> dict:
     chunks = retrieve_chunks(query)
 
