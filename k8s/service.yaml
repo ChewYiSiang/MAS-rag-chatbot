@@ -1,0 +1,29 @@
+# exposes these containers so they can talk to each other or to outside world
+# type: NodePort makes API reachable from browser
+# type: ClusterIP makes ChromaDB reachable only inside the cluster
+apiVersion: v1
+kind: Service
+metadata:
+  name: finreg-api-service
+spec:
+  selector:
+    app: finreg-api
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 30080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chromadb-service
+spec:
+  selector:
+    app: chromadb
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000

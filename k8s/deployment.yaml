@@ -1,0 +1,71 @@
+# tells kubernetes what containers to run and how many replicas (in this case, 2 to load balance between them automatically)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finreg-api
+  labels:
+    app: finreg-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: finreg-api
+  template:
+    metadata:
+      labels:
+        app: finreg-api
+    spec:
+      containers:
+        - name: finreg-api
+          image: yisiang/mas-rag-chatbot:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: CHROMA_HOST
+              value: "chromadb-service"
+            - name: CHROMA_PORT
+              value: "8000"
+            - name: OLLAMA_HOST
+              value: "http://host.minikube.internal:11434"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chromadb
+  labels:
+    app: chromadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chromadb
+  template:
+    metadata:
+      labels:
+        app: chromadb
+    spec:
+      containers:
+        - name: chromadb
+          image: chromadb/chroma:0.6.3
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
