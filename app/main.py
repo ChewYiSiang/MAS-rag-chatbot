@@ -12,7 +12,7 @@ app = FastAPI(
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "service": "RAG chatbot"}
+    return {"status": "ok", "service": "MAS-RAG-CHATBOT"}
 
 
 @app.post("/chat", response_model=ChatResponse)

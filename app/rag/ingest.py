@@ -12,6 +12,15 @@ CHUNK_OVERLAP = 50
 
 # flow: read PDF -> split into 500 characters chunk size with 50 character overlap -> each chunk is embedded into vectors by sentence-transformer model -> vectors stored in ChromaDB
 def get_chroma_client():
+    # uses chromadb from docker
+    chroma_host = os.getenv("CHROMA_HOST", "localhost")
+    chroma_port = int(os.getenv("CHROMA_PORT", "8001"))
+
+    # if running inside docker, connect to chromaDB server
+    if chroma_host != "localhost":
+        return chromadb.HttpClient(host=chroma_host, port=chroma_port)
+    
+    # local development (persistent file storage)
     return chromadb.PersistentClient(path=CHROMA_PATH)
 
 def get_collection(client):

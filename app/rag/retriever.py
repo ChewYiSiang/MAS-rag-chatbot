@@ -1,3 +1,4 @@
+import os
 import ollama
 from sentence_transformers import SentenceTransformer
 from app.rag.ingest import get_chroma_client, get_collection, EMBED_MODEL
@@ -63,7 +64,9 @@ def answer_query(query: str) -> dict:
     
     prompt = build_prompt(query, chunks)
 
-    response = ollama.chat(
+    ollama_host = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+    client = ollama.Client(host=ollama_host)
+    response = client.chat(
         model=MODEL,
         messages=[{"role": "user", "content": prompt}]
     )
